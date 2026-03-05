@@ -23,7 +23,9 @@ from mcp.types import (
     Tool,
 )
 
-from .database import StudyBibleDB
+import json
+
+from .database import BOOK_ABBREV_MAP, StudyBibleDB
 
 # Purple book with gold cross icon (32x32 PNG, base64 encoded)
 ICON_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAtklEQVR42mNgGOmAEZtgQ9TV/7SwrGGZNiNeB9DKYnwOYcGl6MajG1S1VENOA6s4E4yxounvfw0NDZpYjm4mckgz0drnhMxmIdew5bO3M9w+twfOr5veS5Y5TAOdDUcdMOAOYCE2wWEDqkYueNVEpnpSxwHIqR3ZcmziqMBzNA1QJwqwFTLocT5aEI06YNQBow6gaUGEDUAqGk/qhwCu1iutWsY4+wW0bJYT1S+gZUgMqq7ZKAAA/oE/8EmGTpMAAAAASUVORK5CYII="
@@ -494,6 +496,65 @@ async def handle_get_key_terms(args: dict[str, Any]) -> list[TextContent]:
 # ANE context handler
 # =========================================================================
 
+_KEY_REF_PATTERN = re.compile(r'(\d?\s*[A-Za-z]+)\s+(\d+)')
+
+def _parse_key_ref_books_chapters(key_refs_json: str | list) -> set[tuple[str, int]]:
+    """Parse key_references JSON into {(book_abbr, chapter)} tuples.
+
+    Handles: "Gen 38:6-26", "1 Cor 12:12-27", "Gen 1:1-2:3", "Psalm 104:2-3"
+    Returns: {("Gen", 38), ("1Co", 12), ("Gen", 1), ("Psa", 104)}
+    """
+    refs = json.loads(key_refs_json) if isinstance(key_refs_json, str) else key_refs_json
+    if not refs:
+        return set()
+
+    result = set()
+    for ref in refs:
+        m = _KEY_REF_PATTERN.match(ref.strip())
+        if m:
+            book_raw, chapter_str = m.groups()
+            book_key = book_raw.lower().strip()
+            book_abbr = BOOK_ABBREV_MAP.get(book_key)
+            if not book_abbr:
+                book_abbr = book_raw.strip()[:3].title()
+            result.add((book_abbr, int(chapter_str)))
+    return result
+
+def _refine_broad_entries(entries: list[dict], book_abbr: str, chapter: int | None) -> list[dict]:
+    """Promote broad entries with matching key_references; filter zero-overlap.
+
+    For each entry with match_type='broad':
+    - If any key_reference matches (book_abbr, chapter) -> promote to 'direct', relevance_score=500
+    - Elif no key_reference mentions book_abbr at all -> drop entry
+    - Else -> keep as 'broad' (book mentioned but different chapter)
+    """
+    refined = []
+    for entry in entries:
+        if entry.get("match_type") != "broad":
+            refined.append(entry)
+            continue
+
+        key_refs = entry.get("key_references", "[]")
+        parsed = _parse_key_ref_books_chapters(key_refs)
+
+        if not parsed:
+            refined.append(entry)
+            continue
+
+        books_mentioned = {b for b, c in parsed}
+
+        if chapter is not None and (book_abbr, chapter) in parsed:
+            entry = dict(entry)
+            entry["match_type"] = "direct"
+            entry["relevance_score"] = 500
+            refined.append(entry)
+        elif book_abbr not in books_mentioned:
+            continue
+        else:
+            refined.append(entry)
+
+    return refined
+
 async def handle_get_ane_context(args: dict[str, Any]) -> list[TextContent]:
     """Handle get_ane_context tool - get Ancient Near East background."""
     reference = args.get("reference")
@@ -516,6 +577,14 @@ async def handle_get_ane_context(args: dict[str, Any]) -> list[TextContent]:
         dimension=dimension,
         period=period,
     )
+
+    # Post-query: promote/filter broad entries using key_references
+    if reference and entries:
+        normalized = db._normalize_reference(reference)
+        parts = normalized.split(".")
+        book_abbr = parts[0] if parts else ""
+        chapter = int(parts[1]) if len(parts) > 1 else None
+        entries = _refine_broad_entries(entries, book_abbr, chapter)
 
     if not entries:
         parts = []
