@@ -32,9 +32,12 @@
       ],
       "interpretive_significance": "Recognizing Israel's position on international trade routes transforms the reading of many texts. The 'Ishmaelite caravan' that buys Joseph (Gen 37:25-28) carrying 'gum, balm, and myrrh' reflects the real incense trade. Solomon's wealth is not miraculous but geopolitical — he controlled the crossroads. Ezekiel's lament over Tyre (ch. 27) and Revelation's lament over 'Babylon' (Rev 18:11-13) both use detailed trade catalogues to theologize about the hubris of commercial empires.",
       "period": "united_monarchy",
-      "books": ["Gen", "1Ki", "Ezk", "Rev"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Gen", "chapter_start": 37, "chapter_end": 37},
+        {"book": "1Ki", "chapter_start": 9, "chapter_end": 10},
+        {"book": "Ezk", "chapter_start": 27, "chapter_end": 27},
+        {"book": "Rev", "chapter_start": 18, "chapter_end": 18}
+      ],
       "key_references": ["Gen 37:25-28", "1Ki 9:26-28", "1Ki 10:1-29", "Ezk 27:1-36", "Rev 18:11-13"],
       "scholarly_sources": ["Silver, Economic Structures of Antiquity", "Heltzer, Goods, Prices and the Organization of Trade in Ugarit", "Holladay, 'The Kingdoms of Israel and Judah: Political and Economic Centralization' in The Archaeology of Society in the Holy Land"]
     },
@@ -68,9 +71,13 @@
       ],
       "interpretive_significance": "Understanding the temple as an economic institution illuminates numerous texts. Malachi's call to 'bring the full tithe into the storehouse' (3:10) addresses an institutional funding crisis, not merely individual piety. The Levitical cities (Numbers 35) represent an alternative to the temple-estate model, distributing priestly presence throughout the land. Jesus' temple action is not merely about spiritual purity but economic justice — the 'den of robbers' charge (Jeremiah 7:11; Mark 11:17) accuses the temple establishment of using sacred space for extraction rather than redistribution.",
       "period": "united_monarchy",
-      "books": ["Lev", "Num", "Deu", "Mal", "Mat"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Lev", "chapter_start": 27, "chapter_end": 27},
+        {"book": "Num", "chapter_start": 18, "chapter_end": 18},
+        {"book": "Deu", "chapter_start": 14, "chapter_end": 14},
+        {"book": "Mal", "chapter_start": 3, "chapter_end": 3},
+        {"book": "Mat", "chapter_start": 21, "chapter_end": 21}
+      ],
       "key_references": ["Lev 27:30-33", "Num 18:21-32", "Deu 14:22-29", "Mal 3:8-12", "Mat 21:12-13"],
       "scholarly_sources": ["Heltzer, The Internal Organization of the Kingdom of Ugarit", "Fager, Land Tenure and the Biblical Jubilee", "Schaper, 'The Jerusalem Temple as an Instrument of the Achaemenid Fiscal Administration' in Vetus Testamentum"]
     },
@@ -104,9 +111,12 @@
       ],
       "interpretive_significance": "Taxation in biblical texts is never merely an economic question but a sovereignty question: who ultimately owns the land, the labor, and the harvest? Samuel frames monarchy-as-taxation as a rejection of Yahweh's direct kingship. The prophets condemn excessive royal extraction as covenant violation. Jesus' 'render unto Caesar' does not endorse Roman taxation but exposes its theological tension — the coin bears Caesar's image, but the land and its people bear God's. Reading Zacchaeus as simply 'greedy' misses the structural dimension: he is embedded in an extractive system that systematically impoverishes his own community.",
       "period": "roman",
-      "books": ["1Sa", "1Ki", "Mat", "Luk"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "1Sa", "chapter_start": 8, "chapter_end": 8},
+        {"book": "1Ki", "chapter_start": 5, "chapter_end": 12},
+        {"book": "Mat", "chapter_start": 22, "chapter_end": 22},
+        {"book": "Luk", "chapter_start": 2, "chapter_end": 19}
+      ],
       "key_references": ["1Sa 8:11-18", "1Ki 5:13-14", "1Ki 12:1-16", "Mat 22:15-22", "Luk 19:1-10"],
       "scholarly_sources": ["Silver, Economic Structures of Antiquity", "Udoh, To Caesar What Is Caesar's: Tribute, Taxes, and Imperial Administration in Early Roman Palestine", "Goodman, The Ruling Class of Judaea"]
     },

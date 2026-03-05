@@ -194,9 +194,11 @@
       ],
       "interpretive_significance": "These textual variants are not about doubting the Bible's reliability. They are about recognizing that textual transmission has a history that can be studied. When multiple independent ancient witnesses (LXX, DSS, 1 Enoch, NT quotations) agree against the MT on a specific cluster of passages — all related to divine beings and the populated divine realm — the textual evidence deserves serious attention. Hebrews 1:6 quoting the LXX/DSS reading of Deut 32:43 (a verse absent from most English OTs based on the MT) demonstrates that the NT authors sometimes worked from texts that preserved readings the later MT tradition revised.",
       "period": "divided_monarchy",
-      "books": ["Gen", "Deu", "Psa"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Gen", "chapter_start": 6, "chapter_end": 6},
+        {"book": "Deu", "chapter_start": 32, "chapter_end": 32},
+        {"book": "Psa", "chapter_start": 82, "chapter_end": 110}
+      ],
       "key_references": ["Gen 6:1-4", "Deut 32:8-9", "Deut 32:43", "Ps 82:1", "Ps 110:3", "Heb 1:6", "John 10:34"],
       "scholarly_sources": ["Tov, Textual Criticism of the Hebrew Bible", "Heiser, 'Deuteronomy 32:8 and the Sons of God' (BSac 2001)", "Joosten, 'The LXX as a Source of Information on the Hebrew Bible' in Hebrew Bible/Old Testament", "Skehan, 'A Fragment of the Song of Moses (Deut 32) from Qumran' (BASOR 136, 1954)"]
     }

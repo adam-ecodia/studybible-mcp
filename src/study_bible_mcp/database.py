@@ -916,7 +916,7 @@ class StudyBibleDB:
         reference: str | None = None,
         dimension: str | None = None,
         period: str | None = None,
-        limit: int = 20,
+        limit: int = 30,
     ) -> list[dict]:
         """Get ANE context entries filtered by reference, dimension, and/or period.
 
@@ -929,6 +929,9 @@ class StudyBibleDB:
         params: list = []
         conditions: list[str] = []
         join_clause = ""
+        # Extra columns for relevance scoring when querying by reference
+        extra_cols = ""
+        order_clause = "ORDER BY e.dimension, e.period"
 
         if reference:
             normalized = self._normalize_reference(reference)
@@ -946,6 +949,15 @@ class StudyBibleDB:
                 )
                 params.extend([chapter, chapter])
 
+            # Relevance scoring: tighter chapter ranges = more relevant
+            extra_cols = """,
+                CASE
+                    WHEN bm.chapter_start IS NULL THEN 1000
+                    ELSE (COALESCE(bm.chapter_end, bm.chapter_start) - bm.chapter_start + 1)
+                END AS relevance_score,
+                CASE WHEN bm.chapter_start IS NOT NULL THEN 'direct' ELSE 'broad' END AS match_type"""
+            order_clause = "ORDER BY relevance_score, e.dimension, e.period"
+
         if dimension:
             conditions.append("e.dimension = ?")
             params.append(dimension)
@@ -957,9 +969,9 @@ class StudyBibleDB:
         where = f" WHERE {' AND '.join(conditions)}" if conditions else ""
 
         sql = f"""
-            SELECT DISTINCT e.*
+            SELECT DISTINCT e.*{extra_cols}
             FROM ane_entries e{join_clause}{where}
-            ORDER BY e.dimension, e.period
+            {order_clause}
             LIMIT ?
         """
         params.append(limit)

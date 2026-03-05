@@ -704,6 +704,12 @@ Call with dimension='ane_methodology' to retrieve the derivation hierarchy, conf
                         "united_monarchy", "divided_monarchy", "assyrian_babylonian",
                         "persian", "hellenistic", "roman"
                     ]
+                },
+                "detail_level": {
+                    "type": "string",
+                    "description": "Output detail level. 'brief' = title + summary + significance for all entries. 'standard' (default) = full detail for direct chapter matches, brief for broad/whole-book matches. 'full' = full detail for all entries.",
+                    "enum": ["brief", "standard", "full"],
+                    "default": "standard"
                 }
             }
         }
@@ -990,14 +996,77 @@ def format_key_terms(terms: list[dict]) -> str:
 # ANE context formatting
 # =========================================================================
 
-def format_ane_context(entries: list[dict]) -> str:
-    """Format ANE context entries for display."""
-    if not entries:
-        return "No ANE context entries found for the given criteria.\n"
+def _format_ane_entry_full(entry: dict, lines: list[str]) -> None:
+    """Format a single ANE entry with full detail."""
+    title = entry.get("title", "")
+    summary = entry.get("summary", "")
+    detail = entry.get("detail", "")
+    period_label = entry.get("period_label", "")
+    significance = entry.get("interpretive_significance", "")
 
-    lines = []
+    lines.append(f"### {title}")
+    if period_label:
+        lines.append(f"*Period: {period_label}*")
+    lines.append("")
 
-    # Group entries by dimension
+    if summary:
+        lines.append(summary)
+        lines.append("")
+
+    if detail:
+        lines.append(detail)
+        lines.append("")
+
+    # ANE parallels
+    parallels = _parse_json_field(entry.get("ane_parallels"), [])
+    if parallels:
+        lines.append("**ANE Parallels:**")
+        for p in parallels:
+            lines.append(f"- {p}")
+        lines.append("")
+
+    if significance:
+        lines.append(f"**Interpretive Significance:** {significance}")
+        lines.append("")
+
+    # Key references
+    refs = _parse_json_field(entry.get("key_references"), [])
+    if refs:
+        lines.append(f"**Key References:** {', '.join(refs)}")
+        lines.append("")
+
+    # Scholarly sources
+    sources = _parse_json_field(entry.get("scholarly_sources"), [])
+    if sources:
+        lines.append(f"**Sources:** {'; '.join(sources)}")
+        lines.append("")
+
+
+def _format_ane_entry_brief(entry: dict, lines: list[str]) -> None:
+    """Format a single ANE entry briefly — title, summary, significance, key refs."""
+    title = entry.get("title", "")
+    summary = entry.get("summary", "")
+    significance = entry.get("interpretive_significance", "")
+
+    lines.append(f"### {title}")
+    lines.append("")
+
+    if summary:
+        lines.append(summary)
+        lines.append("")
+
+    if significance:
+        lines.append(f"**Interpretive Significance:** {significance}")
+        lines.append("")
+
+    refs = _parse_json_field(entry.get("key_references"), [])
+    if refs:
+        lines.append(f"**Key References:** {', '.join(refs)}")
+        lines.append("")
+
+
+def _format_grouped(entries: list[dict], lines: list[str], formatter) -> None:
+    """Group entries by dimension and format each with the given formatter."""
     groups: dict[str, list[dict]] = {}
     for entry in entries:
         dim = entry.get("dimension_label", entry.get("dimension", "Unknown"))
@@ -1006,53 +1075,47 @@ def format_ane_context(entries: list[dict]) -> str:
     for dimension_label, group_entries in groups.items():
         lines.append(f"## {dimension_label}")
         lines.append("")
-
         for entry in group_entries:
-            title = entry.get("title", "")
-            summary = entry.get("summary", "")
-            detail = entry.get("detail", "")
-            period_label = entry.get("period_label", "")
-            significance = entry.get("interpretive_significance", "")
-
-            lines.append(f"### {title}")
-            if period_label:
-                lines.append(f"*Period: {period_label}*")
-            lines.append("")
-
-            if summary:
-                lines.append(summary)
-                lines.append("")
-
-            if detail:
-                lines.append(detail)
-                lines.append("")
-
-            # ANE parallels
-            parallels = _parse_json_field(entry.get("ane_parallels"), [])
-            if parallels:
-                lines.append("**ANE Parallels:**")
-                for p in parallels:
-                    lines.append(f"- {p}")
-                lines.append("")
-
-            if significance:
-                lines.append(f"**Interpretive Significance:** {significance}")
-                lines.append("")
-
-            # Key references
-            refs = _parse_json_field(entry.get("key_references"), [])
-            if refs:
-                lines.append(f"**Key References:** {', '.join(refs)}")
-                lines.append("")
-
-            # Scholarly sources
-            sources = _parse_json_field(entry.get("scholarly_sources"), [])
-            if sources:
-                lines.append(f"**Sources:** {'; '.join(sources)}")
-                lines.append("")
-
+            formatter(entry, lines)
         lines.append("---")
         lines.append("")
+
+
+def format_ane_context(entries: list[dict], detail_level: str = "standard") -> str:
+    """Format ANE context entries for display.
+
+    Args:
+        entries: List of ANE entry dicts from the database.
+        detail_level: 'brief' = all entries brief, 'standard' = direct matches full /
+            broad matches brief, 'full' = all entries full.
+    """
+    if not entries:
+        return "No ANE context entries found for the given criteria.\n"
+
+    lines = []
+    has_match_types = any(e.get("match_type") for e in entries)
+
+    if detail_level == "full" or not has_match_types:
+        # Full detail for everything, or no match_type info (dimension/period queries)
+        formatter = _format_ane_entry_full if detail_level != "brief" else _format_ane_entry_brief
+        _format_grouped(entries, lines, formatter)
+    elif detail_level == "brief":
+        _format_grouped(entries, lines, _format_ane_entry_brief)
+    else:
+        # Standard mode: separate direct from broad with clear headers
+        direct = [e for e in entries if e.get("match_type") == "direct"]
+        broad = [e for e in entries if e.get("match_type") == "broad"]
+
+        if direct:
+            lines.append("# Directly Relevant to This Passage")
+            lines.append("")
+            _format_grouped(direct, lines, _format_ane_entry_full)
+
+        if broad:
+            lines.append("# General ANE Reading Frame")
+            lines.append("*These entries provide broad cultural context for this book. Summaries shown; call with detail_level='full' for complete entries.*")
+            lines.append("")
+            _format_grouped(broad, lines, _format_ane_entry_brief)
 
     return "\n".join(lines)
 

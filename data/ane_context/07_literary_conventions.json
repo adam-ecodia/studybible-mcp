@@ -122,9 +122,12 @@
       ],
       "interpretive_significance": "Understanding genealogical conventions prevents forcing biological literalism onto texts designed for theological and literary purposes. Matthew's omission of kings is not an error but a standard literary technique. The large numbers in Genesis 5 likely follow conventions similar to the Sumerian King List rather than modern actuarial tables. Biblical genealogies answer the question 'What is this person's theological identity and covenantal standing?' rather than 'What is this person's complete biological ancestry?'",
       "period": "patriarchal",
-      "books": ["Gen", "Rut", "Mat", "Luk"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Gen", "chapter_start": 5, "chapter_end": 46},
+        {"book": "Rut", "chapter_start": 4, "chapter_end": 4},
+        {"book": "Mat", "chapter_start": 1, "chapter_end": 1},
+        {"book": "Luk", "chapter_start": 3, "chapter_end": 3}
+      ],
       "key_references": ["Gen 5:1-32", "Gen 11:10-26", "Rut 4:18-22", "Mat 1:1-17", "Luk 3:23-38"],
       "scholarly_sources": ["Wilson, Genealogy and History in the Biblical World", "Johnson, The Purpose of the Biblical Genealogies", "Hess, 'The Genealogies of Genesis 1-11 and Comparative Literature' (Biblica 1989)", "Sparks, Ancient Texts for the Study of the Hebrew Bible"]
     },
@@ -158,9 +161,12 @@
       ],
       "interpretive_significance": "The hourglass framework prevents two common errors: (1) reading the Old Testament as merely 'the story of Israel' disconnected from universal purposes, and (2) reading the New Testament's universal mission as a novel idea disconnected from the original creation mandate. Every covenant (Abrahamic, Sinaitic, Davidic, New) is a stage in the widening of God's redemptive purpose back toward the universal scope of Genesis 1-2. The Great Commission is not Plan B after Israel's 'failure' but the fulfillment of Abraham's promise to bless all nations — the hourglass opening back out to universal scope.",
       "period": "patriarchal",
-      "books": ["Gen", "Deu", "Act", "Rev"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Gen", "chapter_start": 1, "chapter_end": 12},
+        {"book": "Deu", "chapter_start": 32, "chapter_end": 32},
+        {"book": "Act", "chapter_start": 1, "chapter_end": 2},
+        {"book": "Rev", "chapter_start": 21, "chapter_end": 22}
+      ],
       "key_references": ["Gen 1:1-2:3", "Gen 3:1-24", "Gen 6:1-4", "Gen 10:1-32", "Gen 11:1-9", "Gen 12:1-3", "Deut 32:8-9", "Exod 24:1-11", "Luke 10:1", "Acts 2:1-11", "Matt 28:18-20", "Rev 21:1-22:5"],
       "scholarly_sources": ["Bauckham, Bible and Mission: Christian Witness in a Postmodern World", "Heiser, The Unseen Realm, ch. 14-16", "Wright, The Mission of God", "Block, The Gods of the Nations"]
     }

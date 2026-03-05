@@ -499,6 +499,7 @@ async def handle_get_ane_context(args: dict[str, Any]) -> list[TextContent]:
     reference = args.get("reference")
     dimension = args.get("dimension")
     period = args.get("period")
+    detail_level = args.get("detail_level", "standard")
 
     has_data = await db.has_ane_data()
     if not has_data:
@@ -531,7 +532,7 @@ async def handle_get_ane_context(args: dict[str, Any]) -> list[TextContent]:
         header += f" for {reference}"
     header += "\n\n"
 
-    result = header + format_ane_context(entries)
+    result = header + format_ane_context(entries, detail_level=detail_level)
     return text(result)
 
 

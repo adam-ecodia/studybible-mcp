@@ -73,18 +73,28 @@ def parse_ane_context_file(filepath: Path) -> Iterator[dict]:
             "scholarly_sources": json.dumps(scholarly_sources) if isinstance(scholarly_sources, list) else scholarly_sources,
         }
 
-        # Build book mappings
+        # Build book mappings — supports two formats:
+        # Old: "books": ["Gen", "Exo"], "chapter_start": null, "chapter_end": null
+        # New: "books": [{"book": "Gen", "chapter_start": 6, "chapter_end": 6}, ...]
         books = entry_data.get("books", [])
         chapter_start = entry_data.get("chapter_start")
         chapter_end = entry_data.get("chapter_end")
 
         book_mappings = []
         for book in books:
-            book_mappings.append({
-                "entry_id": entry_id,
-                "book": book,
-                "chapter_start": chapter_start,
-                "chapter_end": chapter_end,
-            })
+            if isinstance(book, dict):
+                book_mappings.append({
+                    "entry_id": entry_id,
+                    "book": book["book"],
+                    "chapter_start": book.get("chapter_start"),
+                    "chapter_end": book.get("chapter_end"),
+                })
+            else:
+                book_mappings.append({
+                    "entry_id": entry_id,
+                    "book": book,
+                    "chapter_start": chapter_start,
+                    "chapter_end": chapter_end,
+                })
 
         yield entry, book_mappings

@@ -14,9 +14,13 @@
       ],
       "interpretive_significance": "Understanding the four-room house layout illuminates numerous biblical passages. Rahab hiding spies under flax on her roof (Josh 2:6), David seeing Bathsheba from his palace roof (2 Sam 11:2), and Peter's rooftop vision (Acts 10:9) all assume the flat-roof domestic architecture of the region. The multi-generational household explains why biblical commands address the 'house' (bayit) as a social unit encompassing three or more generations, servants, and resident aliens — not the nuclear family of modern Western assumptions.",
       "period": "judges_early_monarchy",
-      "books": ["Jos", "Jdg", "1Sa", "2Sa", "Act"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Jos", "chapter_start": 2, "chapter_end": 2},
+        {"book": "Jdg", "chapter_start": 16, "chapter_end": 16},
+        {"book": "1Sa", "chapter_start": 9, "chapter_end": 19},
+        {"book": "2Sa", "chapter_start": 11, "chapter_end": 11},
+        {"book": "Act", "chapter_start": 10, "chapter_end": 10}
+      ],
       "key_references": ["Josh 2:6", "Judg 16:27", "2 Sam 11:2", "Deut 22:8", "Acts 10:9"],
       "scholarly_sources": ["King & Stager, Life in Biblical Israel", "Mazar, Archaeology of the Land of the Bible, 10,000–586 BCE", "Faust, The Archaeology of Israelite Society in Iron Age II", "Ebeling, Women's Lives in Biblical Times"]
     },
@@ -86,9 +90,11 @@
       ],
       "interpretive_significance": "Hezekiah's tunnel is one of the rare cases where a biblical narrative (2 Kgs 20:20) is directly confirmed by archaeological and epigraphic evidence (the Siloam Inscription). The well type-scene — where a stranger meets a woman at a well, water is drawn, and betrothal follows — is a deliberate literary convention in Genesis (Isaac/Rebekah, Jacob/Rachel) and Exodus (Moses/Zipporah). When Jesus meets the Samaritan woman at Jacob's well (John 4), the original audience would have recognized the betrothal type-scene being invoked and transformed: Jesus offers not marriage but living water, and the woman becomes not a bride but an evangelist.",
       "period": "divided_monarchy",
-      "books": ["Gen", "2Ki", "Jhn"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Gen", "chapter_start": 24, "chapter_end": 29},
+        {"book": "2Ki", "chapter_start": 20, "chapter_end": 20},
+        {"book": "Jhn", "chapter_start": 4, "chapter_end": 4}
+      ],
       "key_references": ["Gen 24:11-27", "Gen 29:1-12", "2 Kgs 20:20", "2 Chr 32:30", "John 4:1-26"],
       "scholarly_sources": ["Mazar, Archaeology of the Land of the Bible, 10,000–586 BCE", "King & Stager, Life in Biblical Israel", "Gill, 'The Geology of the City of David and Its Ancient Subterranean Waterworks' in Excavations at the City of David", "Alter, The Art of Biblical Narrative (on well type-scenes)"]
     },
@@ -122,9 +128,11 @@
       ],
       "interpretive_significance": "Jeremiah's potter metaphor (Jer 18:1-6) is not abstract theology but draws on a manufacturing process his audience witnessed regularly — the power of the image lies in its ordinariness. Gideon's three hundred men smashing jars to reveal torches (Judg 7:16-20) exploits storage jars as improvised weapons. Archaeological pottery evidence has confirmed the historicity of destruction layers matching biblical accounts at sites like Lachish, Hazor, and Gezer. The lamp — ubiquitous in excavations — provides the material referent for biblical wisdom: 'Your word is a lamp to my feet' (Ps 119:105) and Jesus' parable of the ten virgins (Matt 25:1-13) both assume the small clay oil lamp as the primary source of household light.",
       "period": "judges_early_monarchy",
-      "books": ["Jdg", "1Sa", "Jer"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Jdg", "chapter_start": 7, "chapter_end": 7},
+        {"book": "1Sa", "chapter_start": 2, "chapter_end": 2},
+        {"book": "Jer", "chapter_start": 18, "chapter_end": 19}
+      ],
       "key_references": ["Judg 7:16-20", "1 Sam 2:14", "Jer 18:1-6", "Jer 19:1-11", "Lam 4:2", "Ps 119:105"],
       "scholarly_sources": ["Mazar, Archaeology of the Land of the Bible, 10,000–586 BCE", "King & Stager, Life in Biblical Israel", "Dever, What Did the Biblical Writers Know and When Did They Know It?", "Amiran, Ancient Pottery of the Holy Land"]
     }

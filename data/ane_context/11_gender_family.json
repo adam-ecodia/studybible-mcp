@@ -51,9 +51,12 @@
       ],
       "interpretive_significance": "Levirate marriage explains Tamar's actions in Genesis 38 as legally and morally justified within her cultural context, not as mere deception. It illuminates Ruth's threshing-floor encounter with Boaz (Ruth 3) as an appeal to kinship obligation. The Sadducees' hypothetical scenario in Matthew 22 assumes the audience understands levirate law; Jesus' response reframes eschatological existence beyond the categories of patrilineal inheritance entirely. Understanding this institution also clarifies why 'raising up offspring for a brother' was a sacred duty, not merely a social convention.",
       "period": "patriarchal",
-      "books": ["Gen", "Deu", "Rut", "Mat"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Gen", "chapter_start": 38, "chapter_end": 38},
+        {"book": "Deu", "chapter_start": 25, "chapter_end": 25},
+        {"book": "Rut", "chapter_start": 3, "chapter_end": 4},
+        {"book": "Mat", "chapter_start": 22, "chapter_end": 22}
+      ],
       "key_references": ["Gen 38:6-26", "Deut 25:5-10", "Ruth 3:9-13", "Ruth 4:1-12", "Matt 22:23-28"],
       "scholarly_sources": ["Burrows, 'Levirate Marriage in Israel' (JBL 59, 1940)", "Davies, 'Inheritance Rights and the Hebrew Levirate Marriage' (VT 31, 1981)", "Trible, 'A Human Comedy: The Book of Ruth' in God and the Rhetoric of Sexuality", "Westbrook, Property and the Family in Biblical Law (JSOTSup 113)"]
     },

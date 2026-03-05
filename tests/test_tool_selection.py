@@ -337,7 +337,7 @@ class TestGraphEnrichedSearchSelection:
         assert best_tool("Give me a comprehensive enriched view of Genesis 22:1 with all people and places") == "graph_enriched_search"
 
     def test_verse_with_graph_context(self):
-        assert best_tool("Show Matthew 1:1 with full graph context and relationships") == "graph_enriched_search"
+        assert best_tool("Show Matthew 1:1 with graph enriched context and relationships") == "graph_enriched_search"
 
 
 class TestGetStudyNotesSelection:

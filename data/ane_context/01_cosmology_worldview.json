@@ -212,9 +212,11 @@
       ],
       "interpretive_significance": "This framework connects Genesis 6, Levitical purity, and the Gospel exorcism narratives into a single coherent storyline. Jesus' authority over unclean spirits is not a disconnected miracle category but the restoration of cosmic order violated by the Watchers transgression. It also explains the peculiar details of Gospel exorcisms: the spirits' fear of being 'sent to the abyss' (Luke 8:31), their knowledge of Jesus' identity, and their association with desolate/boundary places (tombs, wilderness, waterless regions).",
       "period": "patriarchal",
-      "books": ["Lev", "Mrk", "Luk"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Lev", "chapter_start": 11, "chapter_end": 19},
+        {"book": "Mrk", "chapter_start": 1, "chapter_end": 5},
+        {"book": "Luk", "chapter_start": 8, "chapter_end": 11}
+      ],
       "key_references": ["Lev 11:1-47", "Lev 19:19", "Deut 22:9-11", "Gen 6:1-4", "Mark 1:23-27", "Mark 5:1-20", "Luke 8:31", "Luke 11:24-26"],
       "scholarly_sources": ["Heiser, The Unseen Realm, ch. 17-18", "Stuckenbruck, The Myth of Rebellious Angels", "Archie Wright, The Origin of Evil Spirits", "Wahlen, Jesus and the Impurity of Spirits in the Synoptic Gospels (WUNT)"]
     },
@@ -248,9 +250,13 @@
       ],
       "interpretive_significance": "Recognizing the supernatural vocabulary in Isaiah's judgment oracles transforms how we read both the prophets and Revelation. It reveals a coherent biblical theology of sacred space: just as God's presence makes a place holy (temple), God's judgment can make a place anti-holy — inhabited by the beings that represent cosmic disorder. It also exposes a systematic translation bias: modern translations that render seirim as 'wild goats' in Isaiah but 'demons' in Leviticus obscure a connection the biblical authors intended. Reading Rev 18:2 without Isaiah 13/34 misses that John is not inventing new imagery but interpreting the prophets through their own supernatural vocabulary.",
       "period": "divided_monarchy",
-      "books": ["Isa", "Lev", "Rev", "Mrk", "Luk"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Isa", "chapter_start": 13, "chapter_end": 34},
+        {"book": "Lev", "chapter_start": 17, "chapter_end": 17},
+        {"book": "Rev", "chapter_start": 18, "chapter_end": 18},
+        {"book": "Mrk", "chapter_start": 5, "chapter_end": 5},
+        {"book": "Luk", "chapter_start": 11, "chapter_end": 11}
+      ],
       "key_references": ["Isa 13:19-22", "Isa 34:11-15", "Lev 17:7", "2 Chr 11:15", "Rev 18:2", "Luke 11:24", "Mark 5:1-5"],
       "scholarly_sources": ["Blair, De-Demonising the Old Testament", "Fauth, 'Lilits und Astarten in aramäischen, mandäischen und syrischen Zaubertexten'", "Heiser, The Unseen Realm", "Aune, Revelation (WBC), on Rev 18:2"]
     }

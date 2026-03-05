@@ -68,9 +68,11 @@
       ],
       "interpretive_significance": "The prohibition of necromancy is not an arbitrary cultic rule but a fundamental theological boundary: Yahweh alone is the source of revelation, and the dead belong to his domain. The Endor narrative gains dramatic force when read in its ANE context — Saul, cut off from legitimate prophetic channels (1 Sam 28:6), turns to the very practices he had officially banned, demonstrating his complete spiritual collapse. The fact that the text presents Samuel as genuinely appearing, rather than dismissing the ritual as fraud, suggests the biblical authors took the reality of these practices seriously while condemning them absolutely.",
       "period": "judges_early_monarchy",
-      "books": ["Deu", "1Sa", "Isa"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Deu", "chapter_start": 18, "chapter_end": 18},
+        {"book": "1Sa", "chapter_start": 28, "chapter_end": 28},
+        {"book": "Isa", "chapter_start": 8, "chapter_end": 29}
+      ],
       "key_references": ["Deu 18:10-12", "Lev 19:31", "Lev 20:6", "Lev 20:27", "1Sa 28:3-25", "Isa 8:19-20", "Isa 29:4"],
       "scholarly_sources": ["Tromp, Primitive Conceptions of Death and the Nether World in the Old Testament", "Johnston, Shades of Sheol: Death and Afterlife in the Old Testament", "Schmidt, Israel's Beneficent Dead", "Lewis, Cults of the Dead in Ancient Israel and Ugarit"]
     },
@@ -122,9 +124,10 @@
       ],
       "interpretive_significance": "The Pentateuch's near-silence on afterlife is not theological primitiveness but a polemical contrast with Egypt's death-obsessed religion. Where Egypt invested enormous resources in preparing for death, Torah directs Israel's attention to covenantal life in the present: 'I have set before you life and death, blessings and curses. Now choose life' (Deut 30:19). The concept of divine judgment after death — absent in early Israelite Sheol theology — may eventually have been influenced by Egyptian precedent as it developed in later Second Temple Judaism. Joseph's embalming (Gen 50:2-3) is narrated without comment but stands as the only instance of Israelite mummification, marking it as an Egyptian cultural practice rather than an Israelite norm.",
       "period": "exodus_conquest",
-      "books": ["Exo", "Gen"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Gen", "chapter_start": 50, "chapter_end": 50},
+        {"book": "Exo", "chapter_start": 1, "chapter_end": 12}
+      ],
       "key_references": ["Gen 50:2-3", "Gen 50:26", "Exo 1:11-14", "Exo 12:29-30", "Deu 30:15-20", "Deu 28:1-68"],
       "scholarly_sources": ["Segal, Life After Death: A History of the Afterlife in the Religions of the West", "Johnston, Shades of Sheol: Death and Afterlife in the Old Testament", "Hornung, The Ancient Egyptian Books of the Afterlife", "Assmann, Death and Salvation in Ancient Egypt"]
     }

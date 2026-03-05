@@ -86,9 +86,11 @@
       ],
       "interpretive_significance": "Identifying the rib pattern clarifies the logic and rhetoric of prophetic speech. The prophets are not simply preaching moral improvement; they are prosecuting a legal case based on specific covenant obligations Israel swore to uphold. When Micah summons the mountains as witnesses (Mic 6:1-2), he invokes the same cosmic witnesses present at the original covenant ratification (Deut 30:19). The famous question 'What does the LORD require of you?' (Mic 6:8) is a legal answer to a legal question: what the covenant actually demands versus what Israel has substituted. This legal framing also explains why prophetic judgment is not arbitrary divine anger but the execution of covenant curses the people themselves accepted.",
       "period": "divided_monarchy",
-      "books": ["Isa", "Hos", "Mic"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Isa", "chapter_start": 1, "chapter_end": 1},
+        {"book": "Hos", "chapter_start": 2, "chapter_end": 4},
+        {"book": "Mic", "chapter_start": 6, "chapter_end": 6}
+      ],
       "key_references": ["Isa 1:2-20", "Hos 4:1-10", "Mic 6:1-8", "Deu 30:19", "Deu 32:1"],
       "scholarly_sources": ["Huffmon, 'The Covenant Lawsuit in the Prophets' (JBL, 1959)", "Wright, 'The Lawsuit of God: A Form-Critical Study of Deuteronomy 32'", "Westermann, Basic Forms of Prophetic Speech", "Limburg, 'The Root rib and the Prophetic Lawsuit Speeches' (JBL, 1969)"]
     },
@@ -140,9 +142,11 @@
       ],
       "interpretive_significance": "The grant-treaty distinction illuminates a central tension in biblical theology: how can God's promises to Abraham and David be unconditional while the Sinai covenant is conditional? The ANE background shows these are complementary covenant types operating on different levels. God's commitment to Israel through Abraham (land, offspring, blessing) and David (eternal dynasty) is secured by divine oath and cannot fail, but Israel's experience of blessing or curse within that relationship depends on covenant obedience. This framework helps explain how the exile could happen (Sinai curses activated) without nullifying God's ultimate promises (Abrahamic and Davidic grants intact) — a tension Paul explores in Romans 9-11 and that Psalm 89 wrestles with directly when the Davidic dynasty appears to have ended.",
       "period": "patriarchal",
-      "books": ["Gen", "2Sa", "Psa"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Gen", "chapter_start": 15, "chapter_end": 17},
+        {"book": "2Sa", "chapter_start": 7, "chapter_end": 7},
+        {"book": "Psa", "chapter_start": 89, "chapter_end": 132}
+      ],
       "key_references": ["Gen 15:7-21", "Gen 17:1-8", "2Sa 7:8-16", "Psa 89:1-37", "Psa 132:11-12", "Deu 28:1-68", "Rom 9:4-5"],
       "scholarly_sources": ["Weinfeld, 'The Covenant of Grant in the Old Testament and in the Ancient Near East' (JAOS, 1970)", "Kitchen, On the Reliability of the Old Testament", "Knoppers, 'Ancient Near Eastern Royal Grants and the Davidic Covenant: A Parallel?' (JAOS, 1996) — challenges the strength of the grant parallel", "Hahn, Kinship by Covenant"]
     }

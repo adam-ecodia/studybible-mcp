@@ -122,9 +122,12 @@
       ],
       "interpretive_significance": "Corporate personality is essential for understanding the biblical doctrines of federal headship, original sin, and atonement. Western individualism makes Paul's Adam-Christ parallel seem arbitrary or unjust ('Why should Adam's sin affect me?'), but in the ancient framework, representative headship was a fundamental social reality, not a legal abstraction. It also illuminates the concept of Israel as a corporate entity that can be addressed as a singular 'you' (Deu 6:4), the priestly representation of the people before God, and the early church's self-understanding as the 'body of Christ' (1Co 12:12-27) — not merely a metaphor but a statement about corporate ontology.",
       "period": "patriarchal",
-      "books": ["Gen", "Jos", "Rom", "1Co"],
-      "chapter_start": null,
-      "chapter_end": null,
+      "books": [
+        {"book": "Gen", "chapter_start": 38, "chapter_end": 49},
+        {"book": "Jos", "chapter_start": 7, "chapter_end": 7},
+        {"book": "Rom", "chapter_start": 5, "chapter_end": 5},
+        {"book": "1Co", "chapter_start": 12, "chapter_end": 15}
+      ],
       "key_references": ["Gen 49:1-28", "Jos 7:1-26", "Rom 5:12-21", "1Co 15:20-22", "1Co 12:12-27"],
       "scholarly_sources": ["Robinson, Corporate Personality in Ancient Israel", "Kaminsky, Corporate Responsibility in the Hebrew Bible (JSOTSup 196)", "Wright, The Climax of the Covenant (ch. 2)"]
     }
