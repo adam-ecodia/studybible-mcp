@@ -1104,7 +1104,7 @@ async def run_http_server(host: str, port: int):
         routes=[
             Route("/", endpoint=root, methods=["GET"]),
             *shared_routes,
-            Route("/mcp", endpoint=lambda r: session_manager.handle_request(r.scope, r.receive, r._send), methods=["GET", "POST", "DELETE"]),
+            Mount("/mcp", app=session_manager.handle_request),
         ],
         middleware=[
             Middleware(
