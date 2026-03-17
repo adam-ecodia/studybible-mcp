@@ -3,14 +3,17 @@
 Study Bible MCP Server
 
 Main server implementation providing Bible study tools via MCP protocol.
-Supports both stdio and SSE transports for local and remote deployment.
+Supports stdio, SSE, and Streamable HTTP transports for local and remote deployment.
 """
 
 import asyncio
+import contextlib
 import logging
 import os
 import re
 import sys
+import time
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -853,12 +856,122 @@ async def run_server():
         )
 
 
+# =========================================================================
+# Rate limiting middleware
+# =========================================================================
+
+class RateLimitMiddleware:
+    """Simple in-memory per-IP sliding window rate limiter."""
+
+    def __init__(self, app, max_requests: int = 100, window_seconds: int = 60):
+        self.app = app
+        self.max_requests = max_requests
+        self.window_seconds = window_seconds
+        self._requests: dict[str, list[float]] = defaultdict(list)
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        # Extract client IP
+        client = scope.get("client")
+        ip = client[0] if client else "unknown"
+
+        # Skip rate limiting for health checks
+        path = scope.get("path", "")
+        if path in ("/health", "/"):
+            await self.app(scope, receive, send)
+            return
+
+        now = time.monotonic()
+        window_start = now - self.window_seconds
+
+        # Prune old entries and check count
+        timestamps = self._requests[ip]
+        self._requests[ip] = [t for t in timestamps if t > window_start]
+
+        if len(self._requests[ip]) >= self.max_requests:
+            from starlette.responses import JSONResponse
+            response = JSONResponse(
+                {"error": "Rate limit exceeded. Max 100 requests per minute."},
+                status_code=429,
+                headers={"Retry-After": str(self.window_seconds)},
+            )
+            await response(scope, receive, send)
+            return
+
+        self._requests[ip].append(now)
+        await self.app(scope, receive, send)
+
+
+# =========================================================================
+# Shared HTTP endpoint handlers
+# =========================================================================
+
+def _get_privacy_text() -> str:
+    """Read the PRIVACY.md file and return its contents."""
+    privacy_path = Path(__file__).parent.parent.parent / "PRIVACY.md"
+    if not privacy_path.exists():
+        # Fallback for Docker deployments
+        privacy_path = Path("/app/PRIVACY.md")
+    if privacy_path.exists():
+        return privacy_path.read_text()
+    return "Privacy policy not found. See https://github.com/djayatillake/studybible-mcp/blob/main/PRIVACY.md"
+
+
+def _make_shared_routes():
+    """Create route handler functions and routes shared by SSE and HTTP transports."""
+    from starlette.routing import Route
+    from starlette.responses import JSONResponse, Response
+
+    async def health_check(request):
+        """Health check endpoint for load balancers and monitoring."""
+        db_path = get_db_path()
+        db_exists = db_path.exists()
+        return JSONResponse({
+            "status": "healthy" if db_exists else "degraded",
+            "database": str(db_path),
+            "database_exists": db_exists,
+            "version": "1.0.0",
+        })
+
+    async def serve_icon(request):
+        """Serve the server icon as a PNG file."""
+        import base64
+        icon_bytes = base64.b64decode(ICON_BASE64)
+        return Response(content=icon_bytes, media_type="image/png")
+
+    async def serve_database(request):
+        """Serve the database file for download."""
+        from starlette.responses import FileResponse
+        db_path = get_db_path()
+        if not db_path.exists():
+            return JSONResponse({"error": "Database not found"}, status_code=404)
+        return FileResponse(
+            path=str(db_path),
+            filename="study_bible.db",
+            media_type="application/x-sqlite3",
+        )
+
+    async def privacy_policy(request):
+        """Serve the privacy policy."""
+        return Response(content=_get_privacy_text(), media_type="text/plain; charset=utf-8")
+
+    return [
+        Route("/health", endpoint=health_check, methods=["GET"]),
+        Route("/static/icon.png", endpoint=serve_icon, methods=["GET"]),
+        Route("/download/study_bible.db", endpoint=serve_database, methods=["GET"]),
+        Route("/privacy", endpoint=privacy_policy, methods=["GET"]),
+    ]
+
+
 async def run_sse_server(host: str, port: int):
     """Run the MCP server with SSE transport for remote connections."""
     try:
         from mcp.server.sse import SseServerTransport
         from starlette.applications import Starlette
-        from starlette.routing import Route, Mount
+        from starlette.routing import Route
         from starlette.responses import JSONResponse, Response
         from starlette.middleware import Middleware
         from starlette.middleware.cors import CORSMiddleware
@@ -886,59 +999,30 @@ async def run_sse_server(host: str, port: int):
         """Handle POST messages for SSE transport."""
         await sse.handle_post_message(request.scope, request.receive, request._send)
 
-    async def health_check(request):
-        """Health check endpoint for load balancers and monitoring."""
-        db_path = get_db_path()
-        db_exists = db_path.exists()
-
-        return JSONResponse({
-            "status": "healthy" if db_exists else "degraded",
-            "database": str(db_path),
-            "database_exists": db_exists,
-            "version": "1.0.0",
-        })
-
     async def root(request):
         """Root endpoint with service information."""
         return JSONResponse({
             "name": "Study Bible MCP Server",
             "version": "1.0.0",
             "description": "Bible study tools with Greek/Hebrew lexicons via MCP",
+            "transport": "sse",
             "endpoints": {
                 "/sse": "SSE connection endpoint",
                 "/messages": "Message POST endpoint",
                 "/health": "Health check endpoint",
+                "/privacy": "Privacy policy",
                 "/static/icon.png": "Server icon",
                 "/download/study_bible.db": "Download pre-built database (~600MB)",
             },
             "tools": [tool.name for tool in TOOLS],
         })
 
-    async def serve_icon(request):
-        """Serve the server icon as a PNG file."""
-        import base64
-        icon_bytes = base64.b64decode(ICON_BASE64)
-        return Response(content=icon_bytes, media_type="image/png")
+    shared_routes = _make_shared_routes()
 
-    async def serve_database(request):
-        """Serve the database file for download."""
-        from starlette.responses import FileResponse
-        db_path = get_db_path()
-        if not db_path.exists():
-            return JSONResponse({"error": "Database not found"}, status_code=404)
-        return FileResponse(
-            path=str(db_path),
-            filename="study_bible.db",
-            media_type="application/x-sqlite3",
-        )
-
-    # Create Starlette app with CORS middleware
     app = Starlette(
         routes=[
             Route("/", endpoint=root, methods=["GET"]),
-            Route("/health", endpoint=health_check, methods=["GET"]),
-            Route("/static/icon.png", endpoint=serve_icon, methods=["GET"]),
-            Route("/download/study_bible.db", endpoint=serve_database, methods=["GET"]),
+            *shared_routes,
             Route("/sse", endpoint=handle_sse),
             Route("/messages", endpoint=handle_messages, methods=["POST"]),
         ],
@@ -953,12 +1037,95 @@ async def run_sse_server(host: str, port: int):
         ],
     )
 
+    # Wrap with rate limiting
+    rate_limited_app = RateLimitMiddleware(app)
+
     logger.info(f"Starting SSE server on {host}:{port}")
     logger.info(f"SSE endpoint: http://{host}:{port}/sse")
     logger.info(f"Health check: http://{host}:{port}/health")
 
     config = uvicorn.Config(
-        app,
+        rate_limited_app,
+        host=host,
+        port=port,
+        log_level="info",
+        access_log=True,
+    )
+    server_instance = uvicorn.Server(config)
+    await server_instance.serve()
+
+
+async def run_http_server(host: str, port: int):
+    """Run the MCP server with Streamable HTTP transport."""
+    try:
+        from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
+        from starlette.applications import Starlette
+        from starlette.routing import Route, Mount
+        from starlette.responses import JSONResponse, Response
+        from starlette.middleware import Middleware
+        from starlette.middleware.cors import CORSMiddleware
+        from collections.abc import AsyncIterator
+        import uvicorn
+    except ImportError:
+        logger.error(
+            "Streamable HTTP transport requires additional dependencies. "
+            "Install with: pip install 'study-bible-mcp[sse]' or pip install starlette uvicorn"
+        )
+        sys.exit(1)
+
+    session_manager = StreamableHTTPSessionManager(app=server)
+
+    @contextlib.asynccontextmanager
+    async def lifespan(app: Starlette) -> AsyncIterator[None]:
+        async with session_manager.run():
+            yield
+
+    async def root(request):
+        """Root endpoint with service information."""
+        return JSONResponse({
+            "name": "Study Bible MCP Server",
+            "version": "1.0.0",
+            "description": "Bible study tools with Greek/Hebrew lexicons via MCP",
+            "transport": "streamable-http",
+            "endpoints": {
+                "/mcp": "Streamable HTTP MCP endpoint",
+                "/health": "Health check endpoint",
+                "/privacy": "Privacy policy",
+                "/static/icon.png": "Server icon",
+                "/download/study_bible.db": "Download pre-built database (~600MB)",
+            },
+            "tools": [tool.name for tool in TOOLS],
+        })
+
+    shared_routes = _make_shared_routes()
+
+    app = Starlette(
+        lifespan=lifespan,
+        routes=[
+            Route("/", endpoint=root, methods=["GET"]),
+            *shared_routes,
+            Mount("/mcp", app=session_manager.handle_request),
+        ],
+        middleware=[
+            Middleware(
+                CORSMiddleware,
+                allow_origins=["*"],
+                allow_credentials=True,
+                allow_methods=["*"],
+                allow_headers=["*"],
+            )
+        ],
+    )
+
+    # Wrap with rate limiting
+    rate_limited_app = RateLimitMiddleware(app)
+
+    logger.info(f"Starting Streamable HTTP server on {host}:{port}")
+    logger.info(f"MCP endpoint: http://{host}:{port}/mcp")
+    logger.info(f"Health check: http://{host}:{port}/health")
+
+    config = uvicorn.Config(
+        rate_limited_app,
         host=host,
         port=port,
         log_level="info",
@@ -971,21 +1138,22 @@ async def run_sse_server(host: str, port: int):
 @click.command()
 @click.option(
     "--transport",
-    type=click.Choice(["stdio", "sse"]),
+    type=click.Choice(["stdio", "sse", "http"]),
     default="stdio",
+    envvar="TRANSPORT",
     help="Transport protocol to use",
 )
 @click.option(
     "--host",
     default="0.0.0.0",
-    help="Host for SSE transport",
+    help="Host for SSE/HTTP transport",
 )
 @click.option(
     "--port",
     default=8080,
     type=int,
     envvar="PORT",
-    help="Port for SSE transport (default: 8080, or PORT env var)",
+    help="Port for SSE/HTTP transport (default: 8080, or PORT env var)",
 )
 @click.option(
     "--db-path",
@@ -1002,8 +1170,10 @@ def main(transport: str, host: str, port: int, db_path: str | None):
 
     if transport == "stdio":
         asyncio.run(run_server())
-    else:
+    elif transport == "sse":
         asyncio.run(run_sse_server(host, port))
+    elif transport == "http":
+        asyncio.run(run_http_server(host, port))
 
 
 if __name__ == "__main__":

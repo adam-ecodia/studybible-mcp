@@ -52,7 +52,10 @@ produces responses that are both accessible AND scholarly.
 
 import json
 
-from mcp.types import Tool
+from mcp.types import Tool, ToolAnnotations
+
+# All 18 tools are read-only SQLite queries — no mutations, no side effects
+READ_ONLY = ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True)
 
 
 def _parse_json_field(value, default=None):
@@ -76,6 +79,7 @@ def _truncate(text: str, limit: int, suffix: str = "\n\n*[Truncated]*") -> str:
 TOOLS = [
     Tool(
         name="word_study",
+        annotations=READ_ONLY,
         description="""ALWAYS USE THIS when discussing any Greek or Hebrew word, theological term, or concept.
 
 Even if you know the word from training, this tool provides verified lexical data.
@@ -115,6 +119,7 @@ This makes responses scholarly and shows the depth available through original la
     ),
     Tool(
         name="lookup_verse",
+        annotations=READ_ONLY,
         description="""ALWAYS USE THIS when any Bible verse is mentioned or relevant.
 
 Even if you can quote a verse from memory, this tool provides:
@@ -153,6 +158,7 @@ Supports: 'John 3:16', 'Gen 1:1', 'Romans 3:21-26', etc.""",
     ),
     Tool(
         name="search_lexicon",
+        annotations=READ_ONLY,
         description="""USE THIS to find Greek/Hebrew words for English concepts.
 
 When a user asks about a biblical concept (love, faith, salvation, sin, grace, etc.),
@@ -184,6 +190,7 @@ Also use when you want to identify the Greek/Hebrew behind an English term.""",
     ),
     Tool(
         name="get_cross_references",
+        annotations=READ_ONLY,
         description="""USE THIS for any theological or doctrinal question.
 
 When discussing themes like salvation, grace, atonement, resurrection, etc.,
@@ -213,6 +220,7 @@ not just one proof-text.""",
     ),
     Tool(
         name="lookup_name",
+        annotations=READ_ONLY,
         description="""USE THIS when any biblical person, place, or thing is mentioned.
 
 This is your PRIMARY TOOL for thematic linking across the Bible. The database contains
@@ -253,6 +261,7 @@ rather than just training recall.""",
     ),
     Tool(
         name="parse_morphology",
+        annotations=READ_ONLY,
         description="""Explain a morphological/grammatical parsing code.
 
 For Greek: Robinson codes (e.g., 'V-AAI-3S' = Verb, Aorist, Active, Indicative, 3rd person, Singular)
@@ -278,6 +287,7 @@ person, number, tense, voice, mood, case, and gender where applicable.""",
     ),
     Tool(
         name="search_by_strongs",
+        annotations=READ_ONLY,
         description="""USE THIS after word_study to show how a word is actually used.
 
 After identifying a key Greek/Hebrew word (via word_study or search_lexicon),
@@ -304,6 +314,7 @@ This transforms word study from definition into demonstration.""",
     ),
     Tool(
         name="find_similar_passages",
+        annotations=READ_ONLY,
         description="""Find passages with similar semantic content to a given Bible verse.
 
 USE THIS to discover thematic connections across the Bible that may not be captured
@@ -369,6 +380,7 @@ semantically similar passages ranked by similarity score.""",
     # =========================================================================
     Tool(
         name="explore_genealogy",
+        annotations=READ_ONLY,
         description="""ALWAYS USE THIS when a question involves family lineage, ancestry, descendants, or tribal identity.
 
 This tool traverses multi-generational family trees using genealogical data for 1,100+ biblical persons.
@@ -405,6 +417,7 @@ ALWAYS include the Mermaid diagram in your response so the user can visualize th
     ),
     Tool(
         name="people_in_passage",
+        annotations=READ_ONLY,
         description="""ALWAYS USE THIS when studying or explaining a Bible passage to identify WHO is present and WHERE it takes place.
 
 Returns all people, places, and events mentioned in a passage according to the Theographic Bible Metadata.
@@ -431,6 +444,7 @@ DIFFERENCE FROM graph_enriched_search:
     ),
     Tool(
         name="explore_person_events",
+        annotations=READ_ONLY,
         description="""ALWAYS USE THIS when a user asks about a biblical person's life, biography, or timeline.
 
 Returns every recorded event in a person's life in chronological order, with locations and dates.
@@ -457,6 +471,7 @@ Returns a Mermaid timeline diagram — ALWAYS include this in your response.""",
     ),
     Tool(
         name="explore_place",
+        annotations=READ_ONLY,
         description="""ALWAYS USE THIS when a user asks about a biblical location or its significance.
 
 Returns the complete biblical history of a place: events that occurred there, people born/died there,
@@ -487,6 +502,7 @@ Returns a Mermaid network diagram — ALWAYS include this in your response.""",
     ),
     Tool(
         name="find_connection",
+        annotations=READ_ONLY,
         description="""ALWAYS USE THIS when a user asks how two biblical people are related or connected.
 
 Traces the shortest family relationship path between any two people in the biblical genealogies.
@@ -520,6 +536,7 @@ Returns a Mermaid flowchart — ALWAYS include this in your response.""",
     ),
     Tool(
         name="graph_enriched_search",
+        annotations=READ_ONLY,
         description="""USE THIS for deep study of a specific verse — combines the verse text with all relational context.
 
 Returns the verse text PLUS all people, places, and events mentioned in it, PLUS family
@@ -555,6 +572,7 @@ DIFFERENCE FROM people_in_passage:
     # =========================================================================
     Tool(
         name="get_study_notes",
+        annotations=READ_ONLY,
         description="""Get scholarly study notes and translation notes for a Bible verse or chapter.
 
 Returns combined commentary from:
@@ -586,6 +604,7 @@ This provides published, peer-reviewed scholarship rather than AI-generated comm
     ),
     Tool(
         name="get_bible_dictionary",
+        annotations=READ_ONLY,
         description="""Look up a topic in the Tyndale Bible Dictionary.
 
 Contains 500+ topical articles covering:
@@ -615,6 +634,7 @@ Returns the full dictionary article with cross-references.""",
     ),
     Tool(
         name="get_key_terms",
+        annotations=READ_ONLY,
         description="""Look up a key theological term in the FIA Key Terms database.
 
 Contains 200+ carefully defined theological and biblical terms with:
@@ -641,6 +661,7 @@ USE THIS when you need:
     ),
     Tool(
         name="get_ane_context",
+        annotations=READ_ONLY,
         description="""Get Ancient Near East (ANE) cultural and historical background for a biblical passage.
 
 The biblical authors and their audiences lived in the Ancient Near East with fundamentally

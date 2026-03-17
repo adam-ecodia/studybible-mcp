@@ -22,8 +22,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy source code
+# Copy source code and privacy policy
 COPY pyproject.toml .
+COPY PRIVACY.md .
 COPY src/ src/
 
 # Install the package
@@ -33,7 +34,7 @@ RUN pip install --no-cache-dir -e .
 RUN mkdir -p /data
 
 # Environment variables - use volume-mounted database
-ENV TRANSPORT=sse
+ENV TRANSPORT=http
 ENV PORT=8080
 ENV STUDY_BIBLE_DB=/data/study_bible.db
 
@@ -45,4 +46,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:${PORT}/health || exit 1
 
 # Run the server
-CMD ["python", "-m", "study_bible_mcp.server", "--transport", "sse", "--host", "0.0.0.0"]
+CMD ["python", "-m", "study_bible_mcp.server", "--host", "0.0.0.0"]

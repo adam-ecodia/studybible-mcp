@@ -19,6 +19,40 @@ That's it. No signup, no API keys, no downloads.
 claude mcp add study-bible https://studybible-mcp.fly.dev/sse
 ```
 
+### ChatGPT (Developer Mode)
+
+1. Open **Settings** → **Developer Mode** → enable it
+2. Go to **Actions** → **Add MCP Server**
+3. Enter URL: `https://studybible-mcp.fly.dev/mcp`
+
+### Cursor / Windsurf / Cline
+
+Add to your MCP configuration (usually `.cursor/mcp.json`, `.windsurf/mcp.json`, or Cline settings):
+
+```json
+{
+  "mcpServers": {
+    "study-bible": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://studybible-mcp.fly.dev/sse"]
+    }
+  }
+}
+```
+
+### Install via pip / uvx (local stdio)
+
+```bash
+pip install studybible-mcp
+studybible-mcp --transport stdio
+```
+
+Or run directly without installing:
+
+```bash
+uvx studybible-mcp --transport stdio
+```
+
 ### Manual Config (Alternative)
 
 If you prefer editing config files directly:
@@ -50,7 +84,7 @@ Config file locations:
 │   Claude Desktop    │     │   Study Bible MCP Server                 │
 │   or Claude Code    │     │   (Fly.io)                               │
 │                     │     │                                          │
-│  ┌───────────────┐  │ SSE │  ┌─────────────┐  ┌───────────────────┐  │
+│  ┌───────────────┐  │ MCP │  ┌─────────────┐  ┌───────────────────┐  │
 │  │ User asks a   │──┼─────┼─▶│ MCP Server  │─▶│ SQLite DB (359MB) │  │
 │  │ Bible question│  │     │  │ (Python)    │  │                   │  │
 │  └───────────────┘  │     │  └─────────────┘  │ • Lexicons (LSJ,  │  │
