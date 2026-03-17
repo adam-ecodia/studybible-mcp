@@ -1060,7 +1060,7 @@ async def run_http_server(host: str, port: int):
     try:
         from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
         from starlette.applications import Starlette
-        from starlette.routing import Route, Mount
+        from starlette.routing import Route
         from starlette.responses import JSONResponse, Response
         from starlette.middleware import Middleware
         from starlette.middleware.cors import CORSMiddleware
@@ -1104,7 +1104,7 @@ async def run_http_server(host: str, port: int):
         routes=[
             Route("/", endpoint=root, methods=["GET"]),
             *shared_routes,
-            Mount("/mcp", app=session_manager.handle_request),
+            Route("/mcp", endpoint=session_manager.handle_request, methods=["GET", "POST", "DELETE"]),
         ],
         middleware=[
             Middleware(
