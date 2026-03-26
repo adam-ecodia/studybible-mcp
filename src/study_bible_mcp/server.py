@@ -42,7 +42,6 @@ from .tools import (
     format_study_notes, format_dictionary_article, format_key_terms,
     format_ane_context, format_ane_dimensions,
     format_heiser_context, format_heiser_themes,
-    format_hlt_verse, format_hlt_study_notes,
 )
 from .hermeneutics import (
     get_genre_from_reference,
