@@ -980,17 +980,23 @@ class StudyBibleDB:
         return await self._fetchall(sql, params)
 
     # =========================================================================
-    # Heiser / HLT queries
+    # Theological scholarship queries (unified: Heiser, Bradley, etc.)
     # =========================================================================
 
-    async def has_heiser_data(self) -> bool:
-        """Check if heiser_content table exists and has data."""
-        return await self._table_has_rows("heiser_content")
+    async def has_theology_data(self, author: str | None = None) -> bool:
+        """Check if theology_content table exists and has data."""
+        if author:
+            rows = await self._fetchall(
+                "SELECT 1 FROM theology_content WHERE source_author = ? LIMIT 1",
+                (author,),
+            )
+            return bool(rows)
+        return await self._table_has_rows("theology_content")
 
-    async def get_heiser_context_by_reference(
-        self, reference: str, limit: int = 20
+    async def get_theology_context_by_reference(
+        self, reference: str, author: str | None = None, limit: int = 20
     ) -> list[dict]:
-        """Get Heiser scholarship entries relevant to a verse reference."""
+        """Get scholarship entries relevant to a verse reference, optionally filtered by author."""
         normalized = self._normalize_reference(reference)
         parts = normalized.split(".")
         book = parts[0] if parts else ""
@@ -1006,64 +1012,99 @@ class StudyBibleDB:
             conditions.append("vi.chapter = ?")
             params.append(chapter)
 
+        author_filter = ""
+        if author:
+            author_filter = " AND tc.source_author = ?"
+
         # Try exact verse match first, then chapter-level
+        exact_params: list = [normalized]
+        if author:
+            exact_params.append(author)
+        exact_params.append(limit)
+
         exact = await self._fetchall(
-            """SELECT DISTINCT hc.*, vi.reference AS matched_ref, vi.relevance,
-                      GROUP_CONCAT(DISTINCT ht.theme_key) AS themes
-               FROM heiser_content hc
-               JOIN heiser_verse_index vi ON hc.id = vi.content_id
-               LEFT JOIN heiser_theme_index hti ON hc.id = hti.content_id
-               LEFT JOIN heiser_themes ht ON hti.theme_key = ht.theme_key
-               WHERE vi.reference = ?
-               GROUP BY hc.id
+            f"""SELECT DISTINCT tc.*, vi.reference AS matched_ref, vi.relevance,
+                      GROUP_CONCAT(DISTINCT tt.theme_key) AS themes
+               FROM theology_content tc
+               JOIN theology_verse_index vi ON tc.id = vi.content_id
+               LEFT JOIN theology_theme_index tti ON tc.id = tti.content_id
+               LEFT JOIN theology_themes tt ON tti.theme_key = tt.theme_key
+               WHERE vi.reference = ?{author_filter}
+               GROUP BY tc.id
                ORDER BY vi.relevance DESC
                LIMIT ?""",
-            (normalized, limit),
+            exact_params,
         )
         if exact:
             return exact
 
         # Fall back to chapter-level
         where = f" AND {' AND '.join(conditions)}" if conditions else ""
+        if author:
+            where += " AND tc.source_author = ?"
+            params.append(author)
         return await self._fetchall(
-            f"""SELECT DISTINCT hc.*, vi.reference AS matched_ref, vi.relevance,
-                       GROUP_CONCAT(DISTINCT ht.theme_key) AS themes
-                FROM heiser_content hc
-                JOIN heiser_verse_index vi ON hc.id = vi.content_id
-                LEFT JOIN heiser_theme_index hti ON hc.id = hti.content_id
-                LEFT JOIN heiser_themes ht ON hti.theme_key = ht.theme_key
+            f"""SELECT DISTINCT tc.*, vi.reference AS matched_ref, vi.relevance,
+                       GROUP_CONCAT(DISTINCT tt.theme_key) AS themes
+                FROM theology_content tc
+                JOIN theology_verse_index vi ON tc.id = vi.content_id
+                LEFT JOIN theology_theme_index tti ON tc.id = tti.content_id
+                LEFT JOIN theology_themes tt ON tti.theme_key = tt.theme_key
                 WHERE 1=1{where}
-                GROUP BY hc.id
+                GROUP BY tc.id
                 ORDER BY vi.relevance DESC
                 LIMIT ?""",
             (*params, limit),
         )
 
-    async def get_heiser_context_by_theme(
-        self, theme_key: str, limit: int = 20
+    async def get_theology_context_by_theme(
+        self, theme_key: str, author: str | None = None, limit: int = 20
     ) -> list[dict]:
-        """Get Heiser scholarship entries for a given theme."""
+        """Get scholarship entries for a given theme, optionally filtered by author."""
+        author_filter = ""
+        params: list = [theme_key]
+        if author:
+            author_filter = " AND tc.source_author = ?"
+            params.append(author)
+        params.append(limit)
         return await self._fetchall(
-            """SELECT DISTINCT hc.*, ht.theme_label, ht.description AS theme_description,
+            f"""SELECT DISTINCT tc.*, tt.theme_label, tt.description AS theme_description,
                       GROUP_CONCAT(DISTINCT vi.reference) AS verse_refs
-               FROM heiser_content hc
-               JOIN heiser_theme_index hti ON hc.id = hti.content_id
-               JOIN heiser_themes ht ON hti.theme_key = ht.theme_key
-               LEFT JOIN heiser_verse_index vi ON hc.id = vi.content_id
-               WHERE hti.theme_key = ?
-               GROUP BY hc.id
+               FROM theology_content tc
+               JOIN theology_theme_index tti ON tc.id = tti.content_id
+               JOIN theology_themes tt ON tti.theme_key = tt.theme_key
+               LEFT JOIN theology_verse_index vi ON tc.id = vi.content_id
+               WHERE tti.theme_key = ?{author_filter}
+               GROUP BY tc.id
+               ORDER BY tc.source_author, tc.id
                LIMIT ?""",
-            (theme_key, limit),
+            params,
         )
 
-    async def get_heiser_themes(self) -> list[dict]:
-        """List all Heiser theological themes."""
+    async def get_theology_themes(self, author: str | None = None) -> list[dict]:
+        """List all theological themes, optionally filtered to those with entries by a specific author."""
+        if author:
+            return await self._fetchall(
+                """SELECT tt.*,
+                          (SELECT COUNT(*) FROM theology_theme_index tti
+                           JOIN theology_content tc ON tti.content_id = tc.id
+                           WHERE tti.theme_key = tt.theme_key AND tc.source_author = ?) AS entry_count
+                   FROM theology_themes tt
+                   WHERE EXISTS (
+                       SELECT 1 FROM theology_theme_index tti
+                       JOIN theology_content tc ON tti.content_id = tc.id
+                       WHERE tti.theme_key = tt.theme_key AND tc.source_author = ?
+                   )
+                   ORDER BY tt.theme_key""",
+                (author, author),
+            )
         return await self._fetchall(
-            """SELECT ht.*,
-                      (SELECT COUNT(*) FROM heiser_theme_index hti WHERE hti.theme_key = ht.theme_key) AS entry_count
-               FROM heiser_themes ht
-               ORDER BY ht.theme_key"""
+            """SELECT tt.*,
+                      (SELECT COUNT(*) FROM theology_theme_index tti WHERE tti.theme_key = tt.theme_key) AS entry_count
+               FROM theology_themes tt
+               ORDER BY tt.theme_key"""
         )
+
 
     async def get_textual_variants(self, reference: str) -> list[dict]:
         """Get textual variants for a reference, with manuscript witnesses."""
@@ -1457,10 +1498,10 @@ def create_schema(conn: sqlite3.Connection):
     """)
     conn.commit()
 
-    # --- Heiser Literal Translation (HLT) tables ---
+    # --- Theological scholarship tables (unified: Heiser, Bradley, etc.) ---
     conn.executescript("""
-        -- Heiser/Van Dorn scholarship content
-        CREATE TABLE IF NOT EXISTS heiser_content (
+        -- Scholarship content (multi-author)
+        CREATE TABLE IF NOT EXISTS theology_content (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             source_work TEXT NOT NULL,
             source_author TEXT NOT NULL,
@@ -1473,12 +1514,13 @@ def create_schema(conn: sqlite3.Connection):
             url TEXT,
             UNIQUE(source_work, chapter_or_episode, title)
         );
-        CREATE INDEX IF NOT EXISTS idx_heiser_source ON heiser_content(source_work);
+        CREATE INDEX IF NOT EXISTS idx_theology_source ON theology_content(source_work);
+        CREATE INDEX IF NOT EXISTS idx_theology_author ON theology_content(source_author);
 
-        -- Maps heiser_content entries to specific verses
-        CREATE TABLE IF NOT EXISTS heiser_verse_index (
+        -- Maps theology_content entries to specific verses
+        CREATE TABLE IF NOT EXISTS theology_verse_index (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            content_id INTEGER NOT NULL REFERENCES heiser_content(id),
+            content_id INTEGER NOT NULL REFERENCES theology_content(id),
             reference TEXT NOT NULL,
             book TEXT NOT NULL,
             chapter INTEGER,
@@ -1486,28 +1528,34 @@ def create_schema(conn: sqlite3.Connection):
             relevance TEXT DEFAULT 'primary',
             UNIQUE(content_id, reference)
         );
-        CREATE INDEX IF NOT EXISTS idx_heiser_vi_ref ON heiser_verse_index(reference);
-        CREATE INDEX IF NOT EXISTS idx_heiser_vi_book ON heiser_verse_index(book);
+        CREATE INDEX IF NOT EXISTS idx_theology_vi_ref ON theology_verse_index(reference);
+        CREATE INDEX IF NOT EXISTS idx_theology_vi_book ON theology_verse_index(book);
 
-        -- Theological themes from Heiser's framework
-        CREATE TABLE IF NOT EXISTS heiser_themes (
+        -- Shared theological themes taxonomy
+        CREATE TABLE IF NOT EXISTS theology_themes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             theme_key TEXT UNIQUE NOT NULL,
             theme_label TEXT NOT NULL,
             description TEXT NOT NULL,
             parent_theme TEXT,
-            heiser_key_works TEXT
+            key_works TEXT
         );
 
         -- Maps themes to content and verses
-        CREATE TABLE IF NOT EXISTS heiser_theme_index (
+        CREATE TABLE IF NOT EXISTS theology_theme_index (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            theme_key TEXT NOT NULL REFERENCES heiser_themes(theme_key),
-            content_id INTEGER REFERENCES heiser_content(id),
+            theme_key TEXT NOT NULL REFERENCES theology_themes(theme_key),
+            content_id INTEGER REFERENCES theology_content(id),
             reference TEXT,
             UNIQUE(theme_key, content_id, reference)
         );
-        CREATE INDEX IF NOT EXISTS idx_heiser_ti_theme ON heiser_theme_index(theme_key);
+        CREATE INDEX IF NOT EXISTS idx_theology_ti_theme ON theology_theme_index(theme_key);
+
+        -- Legacy aliases (views) so old heiser_content_id FKs still resolve
+        CREATE VIEW IF NOT EXISTS heiser_content AS SELECT * FROM theology_content;
+        CREATE VIEW IF NOT EXISTS heiser_verse_index AS SELECT * FROM theology_verse_index;
+        CREATE VIEW IF NOT EXISTS heiser_themes AS SELECT * FROM theology_themes;
+        CREATE VIEW IF NOT EXISTS heiser_theme_index AS SELECT * FROM theology_theme_index;
 
         -- Textual variants (MT vs DSS/LXX/SP)
         CREATE TABLE IF NOT EXISTS textual_variants (

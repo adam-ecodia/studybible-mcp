@@ -1,0 +1,60 @@
+{
+  "themes": [
+    {
+      "theme_key": "pater_familias_binary",
+      "theme_label": "Pater Familias Binary",
+      "description": "The foundational binary of Scripture: two household heads (YHWH and the rival) heading two incompatible families. Every human being belongs to one family or the other. The binary is exhaustive (no neutral ground), asymmetric (the rival is derivative, not co-eternal), and temporary (resolved eschatologically when one household remains).",
+      "parent_theme": null,
+      "key_works": ["two_fathers_only", "family_foundational_pattern", "fathers_house"]
+    },
+    {
+      "theme_key": "ontological_chains",
+      "theme_label": "Ontological IS-Chains",
+      "description": "YHWH's chain consists of three IS-statements without origin: God IS life (John 5:26; 11:25), God IS love (1 John 4:8), God IS truth (John 14:6). The rival's chain is a creaturely WAS-statement with origin, fall, and terminus: 'You were blameless until iniquity was found in you' (Ezek 28:15). The IS vs. WAS asymmetry is constitutive — darkness has no positive ontological content because it derives from a creature with no I AM.",
+      "parent_theme": "pater_familias_binary",
+      "key_works": ["two_fathers_only"]
+    },
+    {
+      "theme_key": "domain_transfer",
+      "theme_label": "Domain Transfer / Salvation as Household Change",
+      "description": "Salvation described as transfer from one pater familias's domain to another's. Acts 26:17-18 is the compressed canonical summary: four simultaneous movements (eyes opened, darkness to light, power of Satan to God, a place among the sanctified) that map onto the reversal of Genesis 3. Paul's entire letter corpus systematically explicates this commission.",
+      "parent_theme": "pater_familias_binary",
+      "key_works": ["two_fathers_only"]
+    },
+    {
+      "theme_key": "binary_hierarchy",
+      "theme_label": "Binary Pair Hierarchy",
+      "description": "Scripture's binary pairs are not coordinate metaphors but hierarchically organized. Three primary pairs describe what each father IS: life/death (being), righteousness/sin (character), love/pride (posture). Light/darkness is the perceptual derivative. Structural derivatives include kingdom, holy/profane, blessing/curse. Consequent analogies include sheep/goats, flesh/spirit, wise/foolish. Remove a primary and derivatives collapse; remove a derivative and primaries stand.",
+      "parent_theme": "pater_familias_binary",
+      "key_works": ["two_fathers_only"]
+    },
+    {
+      "theme_key": "nested_household",
+      "theme_label": "Nested Household Structure",
+      "description": "The three-level nesting that explains both cosmic conflict and corporate salvation: Satan (cosmic head, 'god of this age') over Adam (creaturely head, 'the first man') over individual households. Christ addresses both levels simultaneously — as the last Adam replacing the creaturely head, and as the Son of God defeating the cosmic head. The incarnation is the structural intersection required by this architecture.",
+      "parent_theme": "pater_familias_binary",
+      "key_works": ["two_fathers_only"]
+    },
+    {
+      "theme_key": "sin_death_satan_chain",
+      "theme_label": "Sin-Death-Satan-Darkness Chain",
+      "description": "The four terms are one reality at four levels — mechanism (sin), condition (death), lord (Satan), perceptual domain (darkness). Every link is connected by a direct equation text: sin's wages IS death (Rom 6:23), the one who holds death's power THAT IS the devil (Heb 2:14), darkness and the power of Satan equated by parallelism (Acts 26:18). The chain closes without a gap. Satan's first recorded speech targets the sin-to-death link specifically.",
+      "parent_theme": "pater_familias_binary",
+      "key_works": ["two_fathers_only"]
+    },
+    {
+      "theme_key": "rival_counterfeits",
+      "theme_label": "Rival's Counterfeit Column",
+      "description": "The rival household has full pater familias structure but no generative ontological capacity. Every feature is corrupted or counterfeited: mimics light (2 Cor 11:14), sonship (Gen 6 bene elohim rebellion), a table (1 Cor 10:21), a kingdom (Matt 12:26), a throne (Rev 2:13), a temple (2 Thess 2:4). Every counterfeit confirms the original belongs to YHWH and that the rival has no capacity to originate — only to corrupt and counterfeit.",
+      "parent_theme": "pater_familias_binary",
+      "key_works": ["two_fathers_only"]
+    },
+    {
+      "theme_key": "corporate_headship",
+      "theme_label": "Corporate Headship / Adam as Captured Head",
+      "description": "Adam is the captured household head, not the cosmic rebel. Paul's vocabulary uses paraptoma (trespass) and parabasis (transgression), never rebellion language. The serpent initiates; Adam participates. The two-party drama (God vs. humanity) should be the three-party structure (God vs. the rival, with humanity as the contested household). 'In Adam / in Christ' language is simultaneously corporate, locative, and participatory.",
+      "parent_theme": "nested_household",
+      "key_works": ["two_fathers_only"]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-"""Parser for Heiser content JSON files and theme taxonomy."""
+"""Parser for theological scholarship content JSON files and theme taxonomy."""
 
 from __future__ import annotations
 
@@ -49,7 +49,9 @@ def parse_themes_file(filepath: str | Path) -> list[dict]:
             "theme_label": theme["theme_label"],
             "description": theme["description"],
             "parent_theme": theme.get("parent_theme"),
-            "heiser_key_works": json.dumps(theme.get("heiser_key_works", [])),
+            "key_works": json.dumps(
+                theme.get("key_works") or theme.get("heiser_key_works", [])
+            ),
         })
     return themes
 

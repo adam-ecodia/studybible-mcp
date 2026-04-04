@@ -733,35 +733,47 @@ Call with dimension='ane_methodology' to retrieve the derivation hierarchy, conf
         }
     ),
     # =========================================================================
-    # Heiser / HLT tools
+    # Theological scholarship tools
     # =========================================================================
     Tool(
-        name="get_heiser_context",
-        annotations=ToolAnnotations(title="Heiser Scholarship", readOnlyHint=True, destructiveHint=False, idempotentHint=True),
-        description="""Get Michael Heiser's scholarship context for a Bible passage or theme.
+        name="get_theology_context",
+        annotations=ToolAnnotations(title="Theological Scholarship", readOnlyHint=True, destructiveHint=False, idempotentHint=True),
+        description="""Get theological scholarship context for a Bible passage or theme.
 
-Returns Heiser/Van Dorn content entries with verse mappings and theme links.
+Returns scholarly content from multiple authors (Heiser, Bradley, etc.) with verse mappings and theme links. When no author is specified, returns all scholars' content for the query — allowing side-by-side comparison.
 
 USE THIS when discussing:
-- The divine council (Psalm 82, Deuteronomy 32, Job 1-2)
-- Sons of God / bene elohim (Genesis 6, Job 38)
-- The Angel of Yahweh / two-powers theology (Genesis 18-19, Zechariah 3)
-- Nephilim, Rephaim, and the giant clans
-- The nachash / serpent in Eden (Genesis 3)
-- Cosmic geography and spiritual warfare
-- Deuteronomy 32 worldview
+- The divine council (Psalm 82, Deuteronomy 32, Job 1-2) — Heiser
+- Sons of God / bene elohim (Genesis 6, Job 38) — Heiser
+- The Angel of Yahweh / two-powers theology — Heiser
+- Nephilim, Rephaim, and the giant clans — Heiser
+- The nachash / serpent in Eden (Genesis 3) — Heiser, Bradley
+- Cosmic geography and spiritual warfare — Heiser
+- Deuteronomy 32 worldview / allotment of nations — Heiser, Bradley
+- Salvation, soteriology, the gospel, conversion, atonement — Bradley (theme: domain_transfer)
+- The Fall, Genesis 3, sin entering the world — Bradley (theme: nested_household, corporate_headship)
+- Life/death, light/darkness, righteousness/sin, love/pride and other biblical binary pairs — Bradley (theme: binary_hierarchy)
+- Satan, the devil, spiritual warfare, the enemy, two kingdoms — Bradley (theme: pater_familias_binary)
+- The sin-death connection, wages of sin, power of death — Bradley (theme: sin_death_satan_chain)
+- Corporate solidarity, "in Adam" / "in Christ", federal headship — Bradley (theme: corporate_headship)
+- Satan's imitation of God's kingdom, counterfeit worship — Bradley (theme: rival_counterfeits)
+- Acts 26:17-18 and Paul's commission — Bradley (theme: domain_transfer)
 
-Query by verse reference OR by theme key.""",
+Query by verse reference, theme key, and/or author.""",
         inputSchema={
             "type": "object",
             "properties": {
                 "reference": {
                     "type": "string",
-                    "description": "Bible reference (e.g., 'Psalm 82:1', 'Genesis 6:2', 'Deuteronomy 32:8')"
+                    "description": "Bible reference (e.g., 'Psalm 82:1', 'Genesis 6:2', 'Acts 26:18', 'John 8:44')"
                 },
                 "theme": {
                     "type": "string",
-                    "description": "Theme key (e.g., 'divine_council', 'bene_elohim', 'two_powers', 'nephilim', 'nachash', 'cosmic_geography')"
+                    "description": "Theme key (e.g., 'divine_council', 'pater_familias_binary', 'domain_transfer', 'sin_death_satan_chain')"
+                },
+                "author": {
+                    "type": "string",
+                    "description": "Filter by author: 'heiser', 'bradley'. Omit to get all scholars' content."
                 },
                 "limit": {
                     "type": "integer",
@@ -774,13 +786,13 @@ Query by verse reference OR by theme key.""",
 
 
 # =========================================================================
-# Format functions — Heiser / HLT
+# Format functions — Theological scholarship
 # =========================================================================
 
-def format_heiser_context(entries: list[dict], themes: list[dict] | None = None) -> str:
-    """Format Heiser scholarship entries for display."""
+def format_theology_context(entries: list[dict], themes: list[dict] | None = None) -> str:
+    """Format theological scholarship entries for display."""
     if not entries:
-        return "No Heiser scholarship found for this query."
+        return "No theological scholarship found for this query."
 
     lines = []
     for entry in entries:
@@ -816,9 +828,10 @@ def format_heiser_context(entries: list[dict], themes: list[dict] | None = None)
     return "\n".join(lines)
 
 
-def format_heiser_themes(themes: list[dict]) -> str:
-    """Format list of all Heiser themes."""
-    lines = ["## Heiser Theological Themes\n"]
+
+def format_theology_themes(themes: list[dict]) -> str:
+    """Format list of all theological themes."""
+    lines = ["## Theological Themes\n"]
     for t in themes:
         count = t.get("entry_count", 0)
         lines.append(f"### {t['theme_label']} (`{t['theme_key']}`)")
@@ -827,6 +840,7 @@ def format_heiser_themes(themes: list[dict]) -> str:
             lines.append(f"**Parent theme**: {t['parent_theme']}")
         lines.append(f"**Entries**: {count}")
         lines.append("")
+
     return "\n".join(lines)
 
 

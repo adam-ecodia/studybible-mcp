@@ -41,7 +41,7 @@ from .tools import (
     mermaid_place_network,
     format_study_notes, format_dictionary_article, format_key_terms,
     format_ane_context, format_ane_dimensions,
-    format_heiser_context, format_heiser_themes,
+    format_theology_context, format_theology_themes,
 )
 from .hermeneutics import (
     get_genre_from_reference,
@@ -826,14 +826,17 @@ async def handle_graph_enriched_search(args: dict[str, Any]) -> list[TextContent
 
 
 # =========================================================================
-# Heiser / HLT tool handlers
+# Theological scholarship tool handler
 # =========================================================================
 
-async def handle_get_heiser_context(args: dict[str, Any]) -> list[TextContent]:
-    """Handle get_heiser_context tool — Heiser scholarship by reference or theme."""
-    has_data = await db.has_heiser_data()
+async def handle_get_theology_context(args: dict[str, Any]) -> list[TextContent]:
+    """Handle get_theology_context tool — theological scholarship by reference, theme, and/or author."""
+    author = args.get("author")
+    has_data = await db.has_theology_data(author=author)
     if not has_data:
-        return text("Heiser scholarship data not available. Run 'python scripts/import_heiser_content.py' first.")
+        if author:
+            return text(f"No scholarship data found for author '{author}'. Run the import script first.")
+        return text("Theological scholarship data not available. Run 'python scripts/import_heiser_content.py' first.")
 
     reference = args.get("reference")
     theme = args.get("theme")
@@ -841,27 +844,30 @@ async def handle_get_heiser_context(args: dict[str, Any]) -> list[TextContent]:
 
     # If neither provided, list themes
     if not reference and not theme:
-        themes = await db.get_heiser_themes()
-        return text(format_heiser_themes(themes))
+        themes = await db.get_theology_themes(author=author)
+        return text(format_theology_themes(themes))
 
     entries = []
     if theme:
-        entries = await db.get_heiser_context_by_theme(theme, limit=limit)
+        entries = await db.get_theology_context_by_theme(theme, author=author, limit=limit)
     elif reference:
-        entries = await db.get_heiser_context_by_reference(reference, limit=limit)
+        entries = await db.get_theology_context_by_reference(reference, author=author, limit=limit)
 
     if not entries:
         query_desc = f"theme='{theme}'" if theme else f"reference='{reference}'"
-        return text(f"No Heiser scholarship found for {query_desc}.")
+        if author:
+            query_desc += f" (author='{author}')"
+        return text(f"No theological scholarship found for {query_desc}.")
 
-    header = "## Heiser Scholarship Context"
+    author_label = author.capitalize() if author else "Theological"
+    header = f"## {author_label} Scholarship Context"
     if reference:
         header += f" for {reference}"
     if theme:
         header += f" — theme: {theme}"
     header += "\n\n"
 
-    result = header + format_heiser_context(entries)
+    result = header + format_theology_context(entries)
     return text(result)
 
 
@@ -884,7 +890,7 @@ _TOOL_HANDLERS = {
     "get_bible_dictionary": handle_get_bible_dictionary,
     "get_key_terms": handle_get_key_terms,
     "get_ane_context": handle_get_ane_context,
-    "get_heiser_context": handle_get_heiser_context,
+    "get_theology_context": handle_get_theology_context,
 }
 
 

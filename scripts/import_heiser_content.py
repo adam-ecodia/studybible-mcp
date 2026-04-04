@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import Heiser content, themes, and textual variants into the study_bible database."""
+"""Import theological scholarship content, themes, and textual variants into the study_bible database."""
 
 from __future__ import annotations
 
@@ -26,15 +26,15 @@ def import_themes(conn: sqlite3.Connection, themes_path: Path) -> int:
     for theme in themes:
         try:
             conn.execute(
-                """INSERT OR REPLACE INTO heiser_themes
-                   (theme_key, theme_label, description, parent_theme, heiser_key_works)
+                """INSERT OR REPLACE INTO theology_themes
+                   (theme_key, theme_label, description, parent_theme, key_works)
                    VALUES (?, ?, ?, ?, ?)""",
                 (
                     theme["theme_key"],
                     theme["theme_label"],
                     theme["description"],
                     theme["parent_theme"],
-                    theme["heiser_key_works"],
+                    theme.get("heiser_key_works") or theme.get("key_works"),
                 ),
             )
             count += 1
@@ -56,7 +56,7 @@ def import_content_file(conn: sqlite3.Connection, filepath: Path) -> tuple[int, 
     for content_entry, verse_refs, theme_keys in parse_heiser_content_file(filepath):
         try:
             cursor = conn.execute(
-                """INSERT OR IGNORE INTO heiser_content
+                """INSERT OR IGNORE INTO theology_content
                    (source_work, source_author, source_type, chapter_or_episode,
                     title, content_summary, content_detail, page_range, url)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
@@ -75,7 +75,7 @@ def import_content_file(conn: sqlite3.Connection, filepath: Path) -> tuple[int, 
             if cursor.rowcount == 0:
                 # Already exists, get the existing ID
                 row = conn.execute(
-                    """SELECT id FROM heiser_content
+                    """SELECT id FROM theology_content
                        WHERE source_work = ? AND chapter_or_episode IS ? AND title = ?""",
                     (content_entry["source_work"], content_entry["chapter_or_episode"], content_entry["title"]),
                 ).fetchone()
@@ -91,7 +91,7 @@ def import_content_file(conn: sqlite3.Connection, filepath: Path) -> tuple[int, 
             for vref in verse_refs:
                 try:
                     conn.execute(
-                        """INSERT OR IGNORE INTO heiser_verse_index
+                        """INSERT OR IGNORE INTO theology_verse_index
                            (content_id, reference, book, chapter, verse, relevance)
                            VALUES (?, ?, ?, ?, ?, ?)""",
                         (content_id, vref["reference"], vref["book"],
@@ -105,7 +105,7 @@ def import_content_file(conn: sqlite3.Connection, filepath: Path) -> tuple[int, 
             for theme_key in theme_keys:
                 try:
                     conn.execute(
-                        """INSERT OR IGNORE INTO heiser_theme_index
+                        """INSERT OR IGNORE INTO theology_theme_index
                            (theme_key, content_id, reference)
                            VALUES (?, ?, NULL)""",
                         (theme_key, content_id),
@@ -228,7 +228,7 @@ def main():
 
     # Summary
     print("\n" + "=" * 60)
-    for table in ["heiser_themes", "heiser_content", "heiser_verse_index", "heiser_theme_index",
+    for table in ["theology_themes", "theology_content", "theology_verse_index", "theology_theme_index",
                    "textual_variants", "manuscript_witnesses"]:
         row = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()
         print(f"  {table}: {row[0]} rows")
