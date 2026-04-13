@@ -12,7 +12,7 @@ This guide covers running your own instance of the Study Bible MCP server.
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/studybible-mcp.git
+   git clone https://github.com/adam-ecodia/studybible-mcp.git
    cd studybible-mcp
    ```
 
